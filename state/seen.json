@@ -1,0 +1,11 @@
+{
+  "seen": [
+    "CISA:CVE-2026-109618",
+    "CISA:CVE-2026-109619",
+    "PHP:https://www.php.net/index.php#2026-10-20-1",
+    "PHP:https://www.php.net/index.php#2026-10-21-5",
+    "PHP:https://www.php.net/index.php#2026-10-26-1",
+    "WordPress:https://wordpress.org/news/2026/10/critical-php-security-release/",
+    "WordPress:https://wordpress.org/news/2026/10/wordpress-7-1-4/"
+  ]
+}
