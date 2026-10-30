@@ -1,0 +1,45 @@
+name: SiteSentinel security advisories
+
+on:
+  schedule:
+    - cron: "17 7 * * *"  # Daily, UTC (GitHub schedules may be delayed)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sitesentinel-daily
+  cancel-in-progress: false
+
+jobs:
+  check-advisories:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check advisories and send alerts
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_FROM: ${{ secrets.ALERT_FROM }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: python sitesentinel.py
+      - name: Persist sent-alert IDs
+        run: |
+          if ! git diff --quiet -- state/seen.json || [ -n "$(git ls-files --others --exclude-standard state/seen.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state/seen.json
+            git commit -m "Record delivered SiteSentinel advisories [skip ci]"
+            git push
+          fi
